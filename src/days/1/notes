@@ -1,0 +1,11 @@
+0 to 99 in order
+puzzle input = sequence of rotations one per line
+L or R indicates rotation direction
+L towards smaller R towards higher
+number = how many clicks
+wraps around from 0 to 99
+starts at 50
+solution = NUMBER OF TIMES DIAL IS LEFT AT 0 AFTER ANY ROTATION
+
+part 2
+any number of times it passes 0
