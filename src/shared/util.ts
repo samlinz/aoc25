@@ -36,10 +36,10 @@ const throwIfNotInAoCRoot = () => {
 
 const getPathForDay = (day: string) => path.join("src", "days", day);
 
-export const loadInput = (
+export const loadInput = <T = string>(
   filename: string,
   format: string,
-  forEachLine?: (line: string) => string,
+  forEachLine?: (line: string) => T,
 ) => {
   throwIfNotInAoCRoot();
   throwIfNoCurrentDay();
