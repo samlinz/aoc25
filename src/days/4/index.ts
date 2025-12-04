@@ -72,7 +72,33 @@ const part1 = (lines: string[]) => {
   return total;
 };
 
+const part2 = (lines: string[]) => {
+  const { lookup, rolls } = parse(lines);
+
+  const cn = countNeighbors(lookup);
+
+  let total = 0;
+
+  outer: while (true) {
+    for (let i = 0; i < rolls.length; i++) {
+      const [x, y] = rolls[i] as [number, number];
+      const rollNeighbors = cn(x, y);
+      if (rollNeighbors < 4) {
+        total++;
+        lookup.get(y)!.delete(x);
+        rolls.splice(i, 1);
+        continue outer; // start again
+      }
+    }
+
+    break; // no changes
+  }
+
+  return total;
+};
+
 // const input = loadInput("testinput1", "lines");
 const input = loadInput("input1", "lines");
 
 l(part1(input));
+l(part2(input));
