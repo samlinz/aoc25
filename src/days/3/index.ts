@@ -71,25 +71,25 @@ const bankMaxJoltage2 = (bank: number[], n = 12) => {
 
   // indexes up to length - n + 1
   for (let i = 0; i <= bank.length - n; i++) {
-    const numAtPos = bank[i];
-    const parts = [numAtPos];
-    let lastPositionUsed = i;
+    const numAtPos1 = bank[i];
+    const parts = [numAtPos1];
+    let lastPos2 = i;
 
     // find the largest number AFTER current position
     while (parts.length < n) {
       let foundNext = false;
 
       for (const p2 of positionsSortedByNumber) {
-        const [p2Num, p2Pos] = p2;
+        const [numAtPos2, i2] = p2;
 
         const numbersNeeded = n - parts.length;
-        const positionsAfterP2 = bank.length - p2Pos;
+        const positionsAfterP2 = bank.length - i2;
 
         if (positionsAfterP2 < numbersNeeded) continue;
-        if (p2Pos <= lastPositionUsed) continue; // must be after lastPositionUsed
+        if (i2 <= lastPos2) continue;
 
-        parts.push(p2Num);
-        lastPositionUsed = p2Pos;
+        parts.push(numAtPos2);
+        lastPos2 = i2;
         foundNext = true;
 
         break;
