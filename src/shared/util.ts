@@ -40,6 +40,7 @@ export const loadInput = <T = string>(
   filename: string,
   format: string,
   forEachLine?: (line: string) => T,
+  removeEmptyLines = true,
 ) => {
   throwIfNotInAoCRoot();
   throwIfNoCurrentDay();
@@ -51,7 +52,9 @@ export const loadInput = <T = string>(
     case "plain":
       return data;
     case "lines": {
-      const rawLines = data.split("\n").filter((line) => line.length > 0);
+      const rawLines = data
+        .split("\n")
+        .filter((line) => (removeEmptyLines ? line.length > 0 : true));
       const processedLines = forEachLine
         ? rawLines.map((line) => forEachLine(line))
         : rawLines;
