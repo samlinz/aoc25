@@ -3,6 +3,7 @@
   "packageManager": "yarn@4.9.1",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/geometric": "^2",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
@@ -11,5 +12,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0"
+  },
+  "dependencies": {
+    "geometric": "^2.5.5"
   }
 }

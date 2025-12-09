@@ -360,6 +360,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/geometric@npm:^2":
+  version: 2.5.3
+  resolution: "@types/geometric@npm:2.5.3"
+  checksum: 10c0/3de95f521a4ca990e86b2e67becf6dc446d3a7606da60d0785959c0354e84335fbe33f922f19192b8c2bfaec85b335835d054878ff6ecc68b2ed4a0509fec83f
+  languageName: node
+  linkType: hard
+
 "@types/json-schema@npm:^7.0.15":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
@@ -570,8 +577,10 @@ __metadata:
   resolution: "aoc25@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.39.1"
+    "@types/geometric": "npm:^2"
     "@types/node": "npm:^24.10.1"
     eslint: "npm:^9.39.1"
+    geometric: "npm:^2.5.5"
     globals: "npm:^16.5.0"
     jiti: "npm:^2.6.1"
     prettier: "npm:^3.7.3"
@@ -1046,6 +1055,13 @@ __metadata:
   dependencies:
     node-gyp: "npm:latest"
   conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"geometric@npm:^2.5.5":
+  version: 2.5.5
+  resolution: "geometric@npm:2.5.5"
+  checksum: 10c0/7574d7b5ec8b11f90cbc6fbe8dc22266b92d37a3838e2e140e503a55698ff8787a723b449ee63adaba74ee54a5b3ed2970b852bc276fb1c46336b3bcd0ee9fdd
   languageName: node
   linkType: hard
 
