@@ -1,4 +1,6 @@
+import { equalTo, Model, solve } from "yalps";
 import { l, loadInput, setCurrentDay } from "../../shared/util.js";
+import { Mode } from "fs";
 
 setCurrentDay("10");
 
@@ -111,9 +113,7 @@ const parse = (lines: string[]) => lines.map(parseLine);
 //   }
 // };
 
-// const seqHash = (sequence: Seq) => sequence.join(",");
 type Seq = number[];
-// type SequenceCache = Set<string>;
 
 type BinaryMachineState = {
   lastState: number;
@@ -176,165 +176,6 @@ const part1HandleMachine = (machine: BinaryMachine) => {
   }
 };
 
-class MinHeap<T> {
-  private data: T[] = [];
-  constructor(private score: (x: T) => number) {}
-
-  push(x: T) {
-    this.data.push(x);
-    this.bubbleUp(this.data.length - 1);
-  }
-
-  pop(): T | undefined {
-    if (this.data.length === 0) return undefined;
-    const top = this.data[0];
-    const last = this.data.pop()!;
-    if (this.data.length > 0) {
-      this.data[0] = last;
-      this.bubbleDown(0);
-    }
-    return top;
-  }
-
-  get size() {
-    return this.data.length;
-  }
-
-  private bubbleUp(i: number) {
-    while (i > 0) {
-      const p = (i - 1) >> 1;
-      if (this.score(this.data[i]!) >= this.score(this.data[p]!)) break;
-      [this.data[i], this.data[p]] = [this.data[p]!, this.data[i]!];
-      i = p;
-    }
-  }
-
-  private bubbleDown(i: number) {
-    const n = this.data.length;
-    while (true) {
-      let smallest = i;
-      const l = i * 2 + 1;
-      const r = i * 2 + 2;
-
-      if (
-        l < n &&
-        this.score(this.data[l]!) < this.score(this.data[smallest]!)
-      ) {
-        smallest = l;
-      }
-      if (
-        r < n &&
-        this.score(this.data[r]!) < this.score(this.data[smallest]!)
-      ) {
-        smallest = r;
-      }
-      if (smallest === i) break;
-      [this.data[i], this.data[smallest]] = [
-        this.data[smallest]!,
-        this.data[i]!,
-      ];
-      i = smallest;
-    }
-  }
-}
-
-const part2HandleMachine = (machine: Machine) => {
-  type State = {
-    values: number[];
-    sequence: Seq;
-    cost: number;
-  };
-
-  const distance = (target: number[], a: number[]) => {
-    let dist = 0;
-    for (let i = 0; i < a.length; i++) {
-      const diff = target[i]! - a[i]!;
-      if (diff < 0) {
-        return -1;
-      }
-      dist += diff;
-    }
-    return dist;
-  };
-
-  const initialValues = machine.initialState.map(() => 0);
-  const initialState: State = {
-    values: initialValues,
-    sequence: [],
-    cost: distance(machine.joltages, initialValues),
-  };
-
-  const calculateNext = (values: number[], b: number[]): number[] => {
-    const next = values.slice();
-
-    b.forEach((buttonIndex) => {
-      next[buttonIndex] = next[buttonIndex]! + 1;
-    });
-    // machine.buttons.forEach((_, i) => {
-    //   next[i] = next[i]! + b[i]!;
-    // });
-
-    return next;
-  };
-
-  const forEachButton = (fn: (b: number) => void) => {
-    for (let b = 0; b < machine.buttons.length; b++) {
-      fn(b);
-    }
-  };
-
-  // const cache: Map<string, number> = new Map();
-  // const states: State[] = [initialState];
-  const states = new MinHeap<State>((s) =>
-    distance(machine.joltages, s.values),
-  );
-
-  states.push(initialState);
-  // let head = 0;
-
-  // const cache: Set<string> = new Set();
-  const cache: Record<string, number> = {};
-  while (states.size > 0) {
-    const currentState = states.pop()!;
-
-    l("best cost " + currentState.cost);
-
-    // const d = distance(machine.joltages, currentState.values);
-    if (currentState.cost === currentState.sequence.length) {
-      l("found solution", currentState.sequence);
-      return currentState;
-    }
-
-    forEachButton((b) => {
-      const next = calculateNext(currentState.values, machine.buttons[b]!);
-      const hash = next.join(",");
-      // const hash = next.map((n, i) =>
-
-      const nextDistance = distance(machine.joltages, next);
-      if (nextDistance === -1) return;
-
-      const nextCost = currentState.sequence.length + 1 + nextDistance;
-      if (nextCost >= currentState.cost) return;
-
-      const cachedCost = cache[hash];
-      // if (cachedCost) return;
-      if (cachedCost !== undefined && cachedCost <= nextCost) {
-        return;
-      }
-
-      cache[hash] = nextCost;
-
-      states.push({
-        cost: nextCost,
-        values: next,
-        sequence: [...currentState.sequence, b],
-      });
-    });
-  }
-
-  throw new Error("no solution found");
-};
-
 const part1 = (lines: string[]) => {
   const machines = parse(lines).map(transformToBinaryMachine1);
 
@@ -349,28 +190,58 @@ const part1 = (lines: string[]) => {
   return total;
 };
 
+const part2SolveMachine = (machine: Machine) => {
+  const { buttons, initialState, joltages, target } = machine;
+
+  const colName = (i: number) => `col_${i}`;
+  const constraints = joltages.reduce(
+    (acc, j, i) => ({ ...acc, [colName(i!)]: equalTo(j) }),
+    {},
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const variables: any = {};
+
+  for (let bi = 0; bi < buttons.length; bi++) {
+    const b = buttons[bi]!;
+    const name = `btn_${bi}`;
+
+    variables[name] = {
+      cost: 1,
+    };
+
+    for (const b2 of b) {
+      variables[name][colName(b2)] = 1;
+    }
+  }
+
+  const model: Model = {
+    direction: "minimize" as const,
+    objective: "cost",
+    constraints,
+    variables,
+    integers: Object.keys(variables),
+  };
+
+  const result = solve(model);
+  if (!result || result.status !== "optimal")
+    throw new Error("no solution found");
+
+  return result.result;
+};
+
 const part2 = (lines: string[]) => {
   const machines = parse(lines);
 
   let total = 0;
   for (const m of machines) {
-    const { sequence } = part2HandleMachine(m)!;
-    const len = sequence.length;
-    l(sequence, "length:", len);
-    // run garbage collection to free memory
-    // global.gc?.();
-    total += len;
+    total += part2SolveMachine(m);
   }
 
   return total;
 };
 
-//   i.forEach(printInBoolean);
-//   let total = 0;
-
-// const i = loadInput("testinput1", "lines");
 const i = loadInput("input1", "lines");
-// l(parse(i));
 
-// l(part1(i));
+l(part1(i));
 l(part2(i));
